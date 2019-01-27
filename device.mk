@@ -20,6 +20,39 @@
 # definition file).
 #
 
+# AB partition scheme
+AB_OTA_UPDATER := true
+
+AB_OTA_PARTITIONS += \
+    boot \
+    system
+
+AB_OTA_POSTINSTALL_CONFIG += \
+    RUN_POSTINSTALL_system=true \
+    POSTINSTALL_PATH_system=system/bin/otapreopt_script \
+    FILESYSTEM_TYPE_system=ext4 \
+    POSTINSTALL_OPTIONAL_system=true
+
+PRODUCT_PACKAGES += \
+    otapreopt_script
+
+# Boot control
+PRODUCT_PACKAGES_DEBUG += \
+    bootctl
+
+PRODUCT_PACKAGES += \
+    update_engine \
+    update_verifier
+
+PRODUCT_STATIC_BOOT_CONTROL_HAL := \
+    bootctrl.sdm660 \
+    libcutils \
+    libgptutils \
+    libz \
+
+PRODUCT_PACKAGES_DEBUG += \
+    update_engine_client
+
 # Audio
 PRODUCT_COPY_FILES += \
 		$(LOCAL_PATH)/configs/audio/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml
@@ -64,6 +97,10 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/gps/lowi.conf:$(TARGET_COPY_OUT_VENDOR)/etc/lowi.conf \
     $(LOCAL_PATH)/configs/gps/sap.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sap.conf \
     $(LOCAL_PATH)/configs/gps/xtwifi.conf:$(TARGET_COPY_OUT_VENDOR)/etc/xtwifi.conf
+
+# Init
+PRODUCT_PACKAGES += \
+    init.recovery.qcom.rc
 
 # IRQ
 PRODUCT_COPY_FILES += \

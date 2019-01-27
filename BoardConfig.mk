@@ -50,5 +50,11 @@ TARGET_NO_BOOTLOADER := true
 TARGET_BOARD_PLATFORM := sdm660
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno509
 
+# Recovery
+TARGET_NO_RECOVERY := true
+BOARD_USES_RECOVERY_AS_BOOT := true
+TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/rootdir/etc/fstab.qcom
+
 # inherit from the proprietary version
--include vendor/asus/X00TD/BoardConfigVendor.mk
+-include vendor/nokia/DRG_sprout/BoardConfigVendor.mk
