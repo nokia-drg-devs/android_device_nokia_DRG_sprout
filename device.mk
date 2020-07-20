@@ -353,7 +353,12 @@ PRODUCT_PACKAGES += \
     qca6234-service.sh \
 
 PRODUCT_PACKAGES += \
-    init.recovery.qcom.rc \
+    init.qcom.rc \
+	init.qcom.usb.rc \
+	init.target.rc \
+	init.qcom.factory.rc \
+	init.msm.usb.configfs.rc \
+	init.DRG.target.rc \
 	fstab.qcom
 
 # RCS
