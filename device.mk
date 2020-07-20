@@ -367,6 +367,12 @@ PRODUCT_PACKAGES += \
     PresencePolling \
     RcsService
 
+# Recovery
+TARGET_RECOVERY_DENSITY := xhdpi
+
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/recovery/init.recovery.qcom.rc:root/init.recovery.qcom.rc
+
 # RenderScript
 PRODUCT_PACKAGES += \
     android.hardware.renderscript@1.0-impl
