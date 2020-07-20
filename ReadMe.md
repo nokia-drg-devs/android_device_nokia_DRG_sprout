@@ -2,7 +2,7 @@
 
 Attempting to bring-up from scratch
 
-Brick counter: 1
+Brick counter: 2
 
 The Nokia 6.1 Plus/Nokia X6 (codenamed _"Dragon"_, TLA _"DRG_sprout"_) is a mid-range smartphone from Nokia.
 It was released in July 2018.
