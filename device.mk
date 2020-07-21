@@ -359,6 +359,7 @@ PRODUCT_PACKAGES += \
     init.qti.qseecomd.sh \
 	init.sat.smartamp.sh \
     qca6234-service.sh \
+		wlan_carrier_bin.sh
 
 PRODUCT_PACKAGES += \
     init.qcom.rc \

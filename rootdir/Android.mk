@@ -154,6 +154,14 @@ LOCAL_SRC_FILES    := bin/qca6234-service.sh
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_EXECUTABLES)
 include $(BUILD_PREBUILT)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE       := wlan_carrier_bin.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES    := bin/wlan_carrier_bin.sh
+LOCAL_VENDOR_MODULE    := true
+include $(BUILD_PREBUILT)
+
 # etc
 
 include $(CLEAR_VARS)
