@@ -44,6 +44,8 @@ PRODUCT_PACKAGES += \
 # Boot control
 PRODUCT_PACKAGES += \
 android.hardware.boot@1.0-impl.recovery \
+android.hardware.boot@1.0-impl \
+android.hardware.boot@1.0-impl-service \
 bootctrl.sdm660 \
 bootctrl.sdm660.recovery
 
@@ -304,6 +306,10 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.software.sip.voip.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.sip.voip.xml \
 	frameworks/native/data/etc/com.nxp.mifare.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/com.nxp.mifare.xml \
 	frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
+
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/configs/permissions/Aprivapp-permissions-qti.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-qti.xml \
+	$(LOCAL_PATH)/configs/permissions/telephony_product_privapp-permissions-qti.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/telephony_product_privapp-permissions-qti.xml \
 
 # Power
 PRODUCT_PACKAGES += \
