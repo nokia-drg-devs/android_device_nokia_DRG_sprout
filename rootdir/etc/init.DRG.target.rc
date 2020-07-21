@@ -1,3 +1,7 @@
+import /vendor/etc/init/hw/init.fingerprint.${ro.boot.fp}.rc
+import /vendor/etc/init/hw/init.vibrator.rc
+import /vendor/etc/init/hw/init.DRG.nfc.rc
+
 # Disable offload for ozo 
 on early-boot
         setprop persist.capture.burst.exposures 0,-9,9
