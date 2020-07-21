@@ -27,6 +27,7 @@
 #
 #
 
+
 service vendor.qseecomd /vendor/bin/qseecomd
    class core
    user root
@@ -147,4 +148,5 @@ service vendor.hvdcp_opti /system/vendor/bin/hvdcp_opti
      class main
      user root
      group system wakelock
+
 

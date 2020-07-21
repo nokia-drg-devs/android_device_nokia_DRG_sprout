@@ -58,8 +58,6 @@ elif [ -f /sys/class/graphics/fb0/virtual_size ]; then
     fb_width=${res%,*}
 fi
 
-bootdevice=`getprop ro.boot.device`
-
 log -t BOOT -p i "MSM target '$1', SoC '$soc_hwplatform', HwID '$soc_hwid', SoC ver '$soc_hwver'"
 
 #For drm based display driver
@@ -80,42 +78,9 @@ function set_density_by_fb() {
         elif [ $fb_width -ge 1440 ]; then
            setprop vendor.display.lcd_density 560
         elif [ $fb_width -ge 1080 ]; then
-         case "$bootdevice" in
-            "C1N") #For C1N project, should use 420
-                setprop vendor.display.lcd_density 420
-                ;;
-            "SS2") #For SS2 project, should use 480
-                setprop vendor.display.lcd_density 480
-                ;;
-            "SAT") #For SAT project, should use 480
-                setprop vendor.display.lcd_density 480
-                ;;
-            "SD1") #For SD1 project, should use 480
            setprop vendor.display.lcd_density 480
-                ;;
-            "PL2") #For PL2 project, should use 420
-                setprop vendor.display.lcd_density 420
-                ;;
-            "B2N") #For B2N project, should use 420
-                setprop vendor.display.lcd_density 420
-                ;;
-            "DRG") #For DRG project, should use 420
-                setprop vendor.display.lcd_density 420
-                ;;
-            "CTL") #For CTL project, should use 420
-                setprop vendor.display.lcd_density 420
-                ;;
-	    "TAS") #For TAS project, should use 420
-                setprop vendor.display.lcd_density 420
-                ;;
-            *)
-                setprop vendor.display.lcd_density 480
-                ;;
-         esac
         elif [ $fb_width -ge 720 ]; then
            setprop vendor.display.lcd_density 320 #for 720X1280 resolution
-        elif [ $fb_width -ge 640 ]; then
-            setprop vendor.display.lcd_density 160 #fihtdc: for 640*480 simu panel
         elif [ $fb_width -ge 480 ]; then
             setprop vendor.display.lcd_density 240 #for 480X854 QRD resolution
         else
@@ -317,6 +282,7 @@ case "$target" in
     "msm8998" | "apq8098_latv")
         case "$soc_hwplatform" in
             *)
+                setprop vendor.rild.libpath "/vendor/lib64/libril-qc-qmi-1.so"
                 setprop vendor.display.lcd_density 560
                 ;;
         esac
@@ -364,6 +330,47 @@ case "$target" in
                 ;;
         esac
         ;;
+    "sdm660")
+        case "$soc_hwid" in
+           385)
+               setprop vendor.media.target.version 1
+        esac
+        if [ -f /vendor/firmware_mnt/verinfo/ver_info.txt ]; then
+            modem=`cat /vendor/firmware_mnt/verinfo/ver_info.txt |
+                    sed -n 's/^[^:]*modem[^:]*:[[:blank:]]*//p' |
+                    sed 's/.*AT.\(.*\)/\1/g' | cut -d \- -f 1`
+            # In SDM660 if modem version is greater than 3.1, need
+            # to use the new vendor-ril which supports L+L feature
+            # otherwise use the existing old one.
+            zygote=`getprop ro.vendor.zygote`
+            case "$zygote" in
+            "zygote64_32")
+                if [ "$modem" \< "3.1" ]; then
+                    setprop vendor.rild.libpath "/vendor/lib64/libril-qc-qmi-1.so"
+                else
+                    setprop vendor.rild.libpath "/vendor/lib64/libril-qc-hal-qmi.so"
+                fi
+                ;;
+            "zygote32")
+                if [ "$modem" \< "3.1" ]; then
+                    setprop vendor.rild.libpath "/vendor/lib/libril-qc-qmi-1.so"
+                else
+                    setprop vendor.rild.libpath "/vendor/lib/libril-qc-hal-qmi.so"
+                fi
+                ;;
+            esac
+        else
+            zygote=`getprop ro.zygote`
+            case "$zygote" in
+            "zygote64_32")
+                setprop vendor.rild.libpath "/vendor/lib64/libril-qc-qmi-1.so"
+                ;;
+            "zygote32")
+                setprop vendor.rild.libpath "/vendor/lib/libril-qc-qmi-1.so"
+                ;;
+            esac
+        fi
+        ;;
     "sdm710" | "msmpeafowl")
         case "$soc_hwplatform" in
             *)
@@ -386,14 +393,6 @@ case "$target" in
                     setprop vendor.media.target.version 1
                 fi
                 ;;
-    #Set property to differentiate SDM660 & SDM455
-    #SOC ID for SDM455 is 385
-    "sdm660")
-        case "$soc_hwid" in
-           385)
-               setprop vendor.media.target.version 1
-        esac
-        ;;
 esac
 
 baseband=`getprop ro.baseband`
@@ -486,19 +485,11 @@ set_perms /sys/class/leds/wled/secure_mode system.graphics 0660
 
 boot_reason=`cat /proc/sys/kernel/boot_reason`
 reboot_reason=`getprop ro.boot.alarmboot`
-case "$bootdevice" in
-    "SS2" | "SAT" | "SD1")
-        # Boot into Android
-        setprop ro.alarm_boot false
-        ;;
-    *)
 if [ "$boot_reason" = "3" ] || [ "$reboot_reason" = "true" ]; then
     setprop ro.vendor.alarm_boot true
 else
     setprop ro.vendor.alarm_boot false
 fi
-        ;;
-esac
 
 # copy GPU frequencies to vendor property
 if [ -f /sys/class/kgsl/kgsl-3d0/gpu_available_frequencies ]; then

@@ -336,10 +336,7 @@ function configure_zram_parameters() {
     MemTotal=${MemTotalStr:16:8}
 
     low_ram=`getprop ro.config.low_ram`
-    device_name=`getprop ro.boot.device`
-    product_name=`getprop ro.product.name`
 
-    zram_size=$1
     # Zram disk - 75% for Go devices.
     # For 512MB Go device, size = 384MB, set same for Non-Go.
     # For 1GB Go device, size = 768MB, set same for Non-Go.
@@ -365,22 +362,7 @@ function configure_zram_parameters() {
         elif [ $MemTotal -le 4194304 ]; then
             echo 2147483648 > /sys/block/zram0/disksize
         else
-            if [ "$zram_size" == "" ]; then
-            # Set Zram disk size=1GB for >=2GB Non-Go targets.
-            echo 1073741824 > /sys/block/zram0/disksize
-            # For PL2 ROW device
-            elif [ "$product_name" == "Plate2_00WW" ]; then
-                echo lz4 > /sys/block/zram0/comp_algorithm
-                echo 8 > /sys/block/zram0/max_comp_streams
-                echo 1610612736 > /sys/block/zram0/disksize
-            else
-                echo lz4 > /sys/block/zram0/comp_algorithm
-                echo $zram_size > /sys/block/zram0/disksize
-            fi
-        fi
-        # change for more free memory in PL2,start
-        if [ "$device_name" == "PL2" ]; then
-            echo 100642 > /proc/sys/vm/min_free_kbytes
+            echo 4294967296 > /sys/block/zram0/disksize
         fi
         mkswap /dev/block/zram0
         swapon /dev/block/zram0 -p 32758
@@ -442,8 +424,10 @@ function enable_swap() {
     fi
 }
 
-function configure_memory_parameters() {
-    # Set Memory parameters.
+# Nokia: We don't use this function.  Renaming it in case  QCOM
+#           adds a new call to it.
+function configure_memory_parameters_DO_NOT_CALL() {
+    # Set Memory paremeters.
     #
     # Set per_process_reclaim tuning parameters
     # All targets will use vmpressure range 50-70,
@@ -476,76 +460,8 @@ else
     MemTotalStr=`cat /proc/meminfo | grep MemTotal`
     MemTotal=${MemTotalStr:16:8}
 
-    # Read adj series and set adj threshold for PPR and ALMK.
-    # This is required since adj values change from framework to framework.
-    adj_series=`cat /sys/module/lowmemorykiller/parameters/adj`
-    adj_1="${adj_series#*,}"
-    set_almk_ppr_adj="${adj_1%%,*}"
-
-    # PPR and ALMK should not act on HOME adj and below.
-    # Normalized ADJ for HOME is 6. Hence multiply by 6
-    # ADJ score represented as INT in LMK params, actual score can be in decimal
-    # Hence add 6 considering a worst case of 0.9 conversion to INT (0.9*6).
-    # For uLMK + Memcg, this will be set as 6 since adj is zero.
-    set_almk_ppr_adj=$(((set_almk_ppr_adj * 6) + 6))
-    echo $set_almk_ppr_adj > /sys/module/lowmemorykiller/parameters/adj_max_shift
-    echo $set_almk_ppr_adj > /sys/module/process_reclaim/parameters/min_score_adj
-
-    #Set other memory parameters
-    echo 1 > /sys/module/process_reclaim/parameters/enable_process_reclaim
-    echo 70 > /sys/module/process_reclaim/parameters/pressure_max
-    echo 30 > /sys/module/process_reclaim/parameters/swap_opt_eff
-    echo 1 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
-    if [ "$arch_type" == "aarch64" ] && [ $MemTotal -gt 4194304 ]; then
-        # for 4G up devices
-        echo 10 > /sys/module/process_reclaim/parameters/pressure_min
-        echo 1024 > /sys/module/process_reclaim/parameters/per_swap_size
-        echo "36864,46080,55296,64512,161280,262144" > /sys/module/lowmemorykiller/parameters/minfree
-        echo "0,100,200,300,800,906" > /sys/module/lowmemorykiller/parameters/adj
-        echo 314572 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
-        echo 51200 > /proc/sys/vm/extra_free_kbytes
-        echo 8 > /sys/block/zram0/max_comp_streams
-        configure_zram_parameters 1610612736
-    elif [ "$arch_type" == "aarch64" ] && [ $MemTotal -gt 3145728 ]; then
-        # for 4G devices
-        echo 10 > /sys/module/process_reclaim/parameters/pressure_min
-        echo 1024 > /sys/module/process_reclaim/parameters/per_swap_size
-        echo "18432,23040,27648,32256,161280,161280" > /sys/module/lowmemorykiller/parameters/minfree
-        echo "0,100,200,300,800,906" > /sys/module/lowmemorykiller/parameters/adj
-        echo 250000 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
-        echo 51200 > /proc/sys/vm/extra_free_kbytes
-        echo 8 > /sys/block/zram0/max_comp_streams
-        configure_zram_parameters 1610612736
-    elif [ "$arch_type" == "aarch64" ] && [ $MemTotal -gt 2097152 ]; then
-        # for 3G devices
-        echo 30 > /sys/module/process_reclaim/parameters/pressure_min
-        echo 1024 > /sys/module/process_reclaim/parameters/per_swap_size
-        echo "18432,23040,27648,32256,161280,161280" > /sys/module/lowmemorykiller/parameters/minfree
-        echo "0,100,200,300,800,906" > /sys/module/lowmemorykiller/parameters/adj
-        #echo 100642 > /proc/sys/vm/min_free_kbytes
-        echo 8 > /sys/block/zram0/max_comp_streams
-        echo 250000 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
-        echo 100 >/proc/sys/vm/swappiness
-        product_name=`getprop ro.product.name`
-        if [ "$product_name" = "Plate2_00WW" ]; then
-            echo "18432,23040,27648,80640,138240,161280" > /sys/module/lowmemorykiller/parameters/minfree
-        fi
-        configure_zram_parameters 1610612736
-    elif [ "$arch_type" == "aarch64" ] && [ $MemTotal -gt 1048576 ]; then
-        # for 2G devices
-        echo 10 > /sys/module/process_reclaim/parameters/pressure_min
-        echo 1024 > /sys/module/process_reclaim/parameters/per_swap_size
-        echo "14746,18432,22118,25805,40000,55000" > /sys/module/lowmemorykiller/parameters/minfree
-        echo 81250 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
-        configure_zram_parameters
-    elif [ "$arch_type" == "aarch64" ]; then
-        echo 50 > /sys/module/process_reclaim/parameters/pressure_min
-        echo 512 > /sys/module/process_reclaim/parameters/per_swap_size
-        echo "14746,18432,22118,25805,40000,55000" > /sys/module/lowmemorykiller/parameters/minfree
-        echo 81250 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
-        configure_zram_parameters
     # Set parameters for 32-bit Go targets.
-    elif [ $MemTotal -le 1048576 ] && [ "$low_ram" == "true" ]; then
+    if [ $MemTotal -le 1048576 ] && [ "$low_ram" == "true" ]; then
         # Disable KLMK, ALMK, PPR & Core Control for Go devices
         echo 0 > /sys/module/lowmemorykiller/parameters/enable_lmk
         echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
@@ -596,7 +512,7 @@ else
 
         # Enable adaptive LMK for all targets &
         # use Google default LMK series for all 64-bit targets >=2GB.
-        echo 1 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
+        echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
 
         # Enable oom_reaper
         if [ -f /sys/module/lowmemorykiller/parameters/oom_reaper ]; then
@@ -620,7 +536,7 @@ else
           *)
             #Set PPR parameters for all other targets.
             echo $set_almk_ppr_adj > /sys/module/process_reclaim/parameters/min_score_adj
-            echo 1 > /sys/module/process_reclaim/parameters/enable_process_reclaim
+            echo 0 > /sys/module/process_reclaim/parameters/enable_process_reclaim
             echo 50 > /sys/module/process_reclaim/parameters/pressure_min
             echo 70 > /sys/module/process_reclaim/parameters/pressure_max
             echo 30 > /sys/module/process_reclaim/parameters/swap_opt_eff
@@ -631,7 +547,7 @@ else
 
     # Set allocstall_threshold to 0 for all targets.
     # Set swappiness to 100 for all targets
-    echo 70 > /sys/module/vmpressure/parameters/allocstall_threshold
+    echo 0 > /sys/module/vmpressure/parameters/allocstall_threshold
     echo 60 > /proc/sys/vm/swappiness
 
     # Disable wsf for all targets beacause we are using efk.
@@ -2384,7 +2300,8 @@ case "$target" in
                 # Enable timer migration to little cluster
                 echo 1 > /proc/sys/kernel/power_aware_timer_migration
                 # Set Memory parameters
-                configure_memory_parameters
+                #configure_memory_parameters
+
             ;;
             *)
 
@@ -2676,9 +2593,8 @@ case "$target" in
             # re-enable thermal and BCL hotplug
             echo 1 > /sys/module/msm_thermal/core_control/enabled
 
-            #Enable input boost configuration
-            echo "0:1401600" > /sys/module/cpu_boost/parameters/input_boost_freq
-            echo 40 > /sys/module/cpu_boost/parameters/input_boost_ms
+            echo 60 > /proc/sys/vm/swappiness
+
             # Set Memory parameters
             configure_memory_parameters
 
@@ -2714,27 +2630,11 @@ case "$target" in
 
             # Start cdsprpcd only for sdm660 and disable for sdm630
             start vendor.cdsprpcd
-
-            # Start Host based Touch processing
-                case "$hw_platform" in
-                        "MTP" | "Surf" | "RCM" | "QRD" )
-                        echo  "Stop hbtp"
-                        #start_hbtp  remove QC touch solution
-                        ;;
-                esac
             ;;
         esac
         #Apply settings for sdm630 and Tahaa
         case "$soc_id" in
             "318" | "327" | "385" )
-
-            # Start Host based Touch processing
-            case "$hw_platform" in
-                "MTP" | "Surf" | "RCM" | "QRD" )
-                echo  "Stop hbtp"
-                #start_hbtp remove QC touch solution
-                ;;
-            esac
 
             # Setting b.L scheduler parameters
             echo 85 > /proc/sys/kernel/sched_upmigrate
@@ -2749,11 +2649,12 @@ case "$target" in
             #init task load, restrict wakeups to preferred cluster
             echo 15 > /proc/sys/kernel/sched_init_task_load
             echo 1 > /proc/sys/kernel/sched_restrict_cluster_spill
-            echo 50000 > /proc/sys/kernel/sched_short_burst_ns
+            # Disable the small task package feature.
+            echo 0 > /proc/sys/kernel/sched_short_burst_ns
 
             # cpuset settings
-            echo 0-3 > /dev/cpuset/background/cpus
-            echo 0-3 > /dev/cpuset/system-background/cpus
+            #echo 0-3 > /dev/cpuset/background/cpus
+            #echo 0-3 > /dev/cpuset/system-background/cpus
 
             # disable thermal bcl hotplug to switch governor
             echo 0 > /sys/module/msm_thermal/core_control/enabled
@@ -2853,11 +2754,22 @@ case "$target" in
                 echo -n enable > $mode
             done
 
-            #Enable input boost configuration
-            echo "4:1401600" > /sys/module/cpu_boost/parameters/input_boost_freq
-            echo 40 > /sys/module/cpu_boost/parameters/input_boost_ms
             # Set Memory parameters
-            configure_memory_parameters
+            # configure_memory_parameters
+            # For memory size > 2G, enable the AMLK. This help to launch latency
+            arch_type=`uname -m`
+            MemTotalStr=`cat /proc/meminfo | grep MemTotal`
+            MemTotal=${MemTotalStr:16:8}
+            if [ "$arch_type" == "aarch64" ] && [ $MemTotal -gt 2097152 ]; then
+                adj_series=`cat /sys/module/lowmemorykiller/parameters/adj`
+                adj_1="${adj_series#*,}"
+                almk_ppr_adj="${adj_1%%,*}"
+                almk_ppr_adj=$(((almk_ppr_adj * 6) + 6))
+                echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
+                echo 80 > /sys/module/vmpressure/parameters/allocstall_threshold
+                echo $almk_ppr_adj > /sys/module/lowmemorykiller/parameters/adj_max_shift
+                echo 81250 > /sys/module/lowmemorykiller/parameters/vmpressure_file_min
+            fi
 
             # Enable bus-dcvs
             for cpubw in /sys/class/devfreq/*qcom,cpubw*
@@ -2891,6 +2803,8 @@ case "$target" in
             echo "cpufreq" > /sys/class/devfreq/soc:qcom,mincpubw/governor
             ;;
         esac
+	# Log kernel wake-up source
+	echo 1 > /sys/module/msm_show_resume_irq/parameters/debug_mask
     ;;
 esac
 
@@ -4998,9 +4912,12 @@ case "$target" in
 	echo N > /sys/module/lpm_levels/system/perf/perf-l2-ret/idle_enabled
 	echo N > /sys/module/lpm_levels/parameters/sleep_disabled
 
-        echo 0-3 > /dev/cpuset/background/cpus
-        echo 0-3 > /dev/cpuset/system-background/cpus
+        #echo 0-3 > /dev/cpuset/background/cpus
+        #echo 0-3 > /dev/cpuset/system-background/cpus
         echo 0 > /proc/sys/kernel/sched_boost
+
+	# Log kernel wake-up source
+	echo 1 > /sys/module/msm_show_resume_irq/parameters/debug_mask
 
         # Set Memory parameters
         configure_memory_parameters
