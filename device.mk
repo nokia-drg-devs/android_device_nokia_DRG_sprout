@@ -344,32 +344,18 @@ PRODUCT_PACKAGES += \
 # Ramdisk
 PRODUCT_PACKAGES += \
     init.class_main.sh \
-    init.crda.sh \
-	init.drg.lcm.sh \
-    init.mdm.sh \
-    init.qcom.class_core.sh \
-    init.qcom.coex.sh \
-    init.qcom.crashdata.sh \
     init.qcom.early_boot.sh \
-    init.qcom.efs.sync.sh \
     init.qcom.post_boot.sh \
-    init.qcom.sdio.sh \
     init.qcom.sensors.sh \
     init.qcom.sh \
-	init.qcom.usb.sh \
-    init.qcom.can.sh \
-    init.qti.fm.sh \
-    init.qti.ims.sh \
+	init.mmi.usb.sh \
     init.qti.qseecomd.sh \
-	init.sat.smartamp.sh \
-    qca6234-service.sh \
 		wlan_carrier_bin.sh
 
 PRODUCT_PACKAGES += \
     init.qcom.rc \
 	init.qcom.usb.rc \
 	init.target.rc \
-	init.qcom.factory.rc \
 	init.msm.usb.configfs.rc \
 	init.DRG.target.rc \
 	fstab.qcom
