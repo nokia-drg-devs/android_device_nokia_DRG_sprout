@@ -2,7 +2,7 @@
 
 Attempting to bring-up from scratch
 
-Brick counter: 2
+Brick counter: 13
 
 The Nokia 6.1 Plus/Nokia X6 (codenamed _"Dragon"_, TLA _"DRG_sprout"_) is a mid-range smartphone from Nokia.
 It was released in July 2018.
@@ -21,3 +21,12 @@ It was released in July 2018.
 | Camera (Front)          | 16 MP, f/2.0, 1/3.1", 1.0µm                                                                                                    |
 
 ![Nokia 6.1 Plus](https://fdn2.gsmarena.com/vv/pics/nokia/nokia-x6-3.jpg)
+
+
+## Dependencies
+
+Run the following commands in your ROM base folder before you build
+
+```git clone https://github.com/Nokia-SDM660/android_external_bson.git -b lineage-17.1 external/bson```
+
+```git clone https://github.com/Nokia-SDM660/android_system_qcom.git -b lineage-17.1 system/qcom```
