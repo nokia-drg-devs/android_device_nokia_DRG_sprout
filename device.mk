@@ -20,6 +20,8 @@
 # definition file).
 #
 
+LOCAL_PATH := device/nokia/DRG_sprout
+
 # Enable updating of APEXes
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
