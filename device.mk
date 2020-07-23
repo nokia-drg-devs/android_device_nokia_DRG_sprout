@@ -115,7 +115,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
 	android.hardware.boot@1.0-impl \
-	android.hardware.boot@1.0-impl-service
+	android.hardware.boot@1.0-service
 
 PRODUCT_PACKAGES_DEBUG += \
 	bootctl
@@ -223,7 +223,7 @@ PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH)/configs/keylayout/elan.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/elan.kl \
 	$(LOCAL_PATH)/configs/keylayout/ff_key.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/ff_key.kl \
 	$(LOCAL_PATH)/configs/keylayout/uinput-fpc.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/uinput-fpc.kl \
-	$(LOCAL_PATH)/configs/keylayout/goodix_fp.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/goodix_fp/kl
+	$(LOCAL_PATH)/configs/keylayout/goodix_fp.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/goodix_fp.kl
 
 # Lights
 PRODUCT_PACKAGES += \
