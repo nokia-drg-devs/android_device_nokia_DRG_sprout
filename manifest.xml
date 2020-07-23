@@ -1,7 +1,3 @@
-<!--
-    Input:
-        manifest.xml
--->
 <manifest version="1.0" type="device" target-level="2">
     <hal format="hidl">
         <name>android.hardware.audio</name>
@@ -908,7 +904,22 @@
         </interface>
         <fqname>@2.1::IRTPService/imsrtpservice</fqname>
     </hal>
-    <sepolicy>
-        <version>29.0</version>
-    </sepolicy>
+	    <hal format="hidl">
+        <name>vendor.lineage.livedisplay</name>
+        <transport>hwbinder</transport>
+        <version>2.0</version>
+        <interface>
+            <name>IPictureAdjustment</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.lineage.trust</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>IUsbRestrict</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
 </manifest>
