@@ -180,7 +180,9 @@ PRODUCT_BOOT_JARS += \
 # Framework Detect
 PRODUCT_PACKAGES += \
 	libqti_vndfwk_detect \
-	libqti_vndfwk_detect.vendor
+	libqti_vndfwk_detect.vendor \
+	libvndfwk_detect_jni.qti \
+	libvndfwk_detect_jni.qti.vendor
 
 # GPS
 PRODUCT_COPY_FILES += \
