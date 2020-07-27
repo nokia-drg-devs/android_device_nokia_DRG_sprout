@@ -43,6 +43,10 @@ PRODUCT_PACKAGES += \
 	otapreopt_script \
 	cppreopts.sh
 
+# AAPT
+PRODUCT_AAPT_CONFIG := normal
+PRODUCT_AAPT_PREF_CONFIG := xxhdpi
+
 # AID/fs configs
 PRODUCT_PACKAGES += \
 	fs_config_files
