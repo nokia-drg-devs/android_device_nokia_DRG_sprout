@@ -398,8 +398,9 @@ PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH)/configs/sensors/sensor_def_qcomdev.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/sensor_def_qcomdev.conf
 
 # Soong namespaces
-PRODUCT_SOONG_NAMESPACES += \
-	$(LOCAL_PATH)
+PRODUCT_BOARD_PLATFORM := sdm660
+PRODUCT_USES_QCOM_HARDWARE := true
+PRODUCT_SOONG_NAMESPACES += $(LOCAL_PATH)
 
 # Telephony-ext
 PRODUCT_PACKAGES += \
