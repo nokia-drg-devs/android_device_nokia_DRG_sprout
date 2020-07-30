@@ -14,9 +14,13 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_DRG_sprout.mk
+    $(LOCAL_DIR)/lineage_DRG_sprout.mk \
+	$(LOCAL_DIR)/bootleg_DRG_sprout.mk
 
 COMMON_LUNCH_CHOICES := \
     lineage_DRG_sprout-user \
     lineage_DRG_sprout-userdebug \
-    lineage_DRG_sprout-eng
+    lineage_DRG_sprout-eng \
+	bootleg_DRG_sprout-user \
+    bootleg_DRG_sprout-userdebug \
+    bootleg_DRG_sprout-eng
