@@ -326,11 +326,11 @@ PRODUCT_PACKAGES += \
 	init.qcom.post_boot.sh \
 	init.qcom.sensors.sh \
 	init.qcom.sh \
-	init.mmi.usb.sh \
 	init.qti.qseecomd.sh \
 	wlan_carrier_bin.sh
 
 PRODUCT_PACKAGES += \
+	ueventd.rc \
 	init.qcom.rc \
 	init.qcom.usb.rc \
 	init.target.rc \
